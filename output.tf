@@ -3,5 +3,5 @@ output "eks_cluster_id" {
 }
 
 output "internal_alb_dns" {
-  value = module.alb.alb_dns
+  value = module.alb.internal_alb_dns
 }
