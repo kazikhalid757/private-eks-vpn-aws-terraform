@@ -4,8 +4,8 @@ module "vpc" {
 
 module "eks" {
   source     = "./modules/eks"
-  vpc_id     = module.vpc.vpc_id          # Ensure the VPC ID is passed
-  subnet_ids = module.vpc.private_subnets # Ensure private subnets are passed
+  vpc_id     = module.vpc.vpc_id          
+  subnet_ids = module.vpc.private_subnets 
 }
 
 module "alb" {
@@ -21,5 +21,5 @@ module "vpn" {
 
 module "nginx_ingress" {
   source        = "./modules/nginx-ingress"
-  eks_cluster_id = module.eks.cluster_id # Ensure the cluster ID is passed
+  eks_cluster_id = module.eks.cluster_id 
 }
