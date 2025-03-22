@@ -41,11 +41,6 @@ variable "cluster_version" {
   default     = "1.27"
 }
 
-variable "on_premise_vpn_ip" {
-  description = "On-premise VPN IP address"
-  type        = string
-}
-
 variable "domain_name" {
   description = "Internal domain name for Route53"
   type        = string
