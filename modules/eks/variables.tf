@@ -1,5 +1,15 @@
-variable "vpc_id" {}
+variable "vpc_id" {
+  type = string
+}
 
-variable "subnet_ids" {
+variable "private_subnets" {
   type = list(string)
+}
+
+variable "cluster_name" {
+  type = string
+}
+
+variable "cluster_version" {
+  type = string
 }
