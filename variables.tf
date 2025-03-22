@@ -3,7 +3,9 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 variable "vpc_id" {}
-variable "subnet_ids" {}
+variable "subnet_ids" {
+  type = list(string)
+}
 
 
 

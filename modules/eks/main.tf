@@ -13,7 +13,7 @@ module "eks" {
       min_size       = 2
       max_size       = 5
       desired_size   = 2
-      subnet_ids     = var.subnet_ids
+      subnet_ids     = tolist(var.subnet_ids)
     }
   }
 }
