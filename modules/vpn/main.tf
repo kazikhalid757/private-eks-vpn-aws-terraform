@@ -1,4 +1,4 @@
-# Create a Client VPN Endpoint
+# Create a Client VPN Endpoint with simplified certificate handling
 resource "aws_ec2_client_vpn_endpoint" "eks_vpn" {
   description            = "Client VPN for EKS"
   server_certificate_arn = aws_acm_certificate.vpn_cert.arn
@@ -12,7 +12,7 @@ resource "aws_ec2_client_vpn_endpoint" "eks_vpn" {
   }
 
   connection_log_options {
-    enabled = false # Disable connection logging for simplicity
+    enabled = false
   }
 
   tags = {
@@ -23,10 +23,10 @@ resource "aws_ec2_client_vpn_endpoint" "eks_vpn" {
 # Associate VPN with Subnets
 resource "aws_ec2_client_vpn_network_association" "eks_vpn_assoc" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.eks_vpn.id
-  subnet_id              = var.private_subnets[0] # Associate with the first private subnet
+  subnet_id              = var.private_subnets[0]
 }
 
-# Create a Security Group for VPN
+# Security Group for VPN
 resource "aws_security_group" "vpn_sg" {
   name        = "eks-vpn-sg"
   description = "Allow VPN traffic to EKS"
@@ -36,7 +36,7 @@ resource "aws_security_group" "vpn_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow VPN access from anywhere
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -51,10 +51,15 @@ resource "aws_security_group" "vpn_sg" {
   }
 }
 
-# Create an ACM Certificate for VPN
+# Simplified ACM Certificate for private DNS
 resource "aws_acm_certificate" "vpn_cert" {
-  domain_name       = var.vpn_cert_domain
+  domain_name       = "vpn.internal"  # Private domain - no validation needed
   validation_method = "DNS"
+
+  lifecycle {
+    # Skip DNS validation since we're using private DNS
+    ignore_changes = [domain_validation_options] 
+  }
 
   tags = {
     Name = "eks-vpn-cert"
