@@ -16,13 +16,13 @@ module "eks" {
   cluster_version = var.cluster_version
 }
 
-module "vpn" {
-  source = "./modules/vpn"
+# module "vpn" {
+#   source = "./modules/vpn"
 
-  vpc_id         = module.vpc.vpc_id
-  private_subnets = module.vpc.private_subnets
-  domain_name = var.domain_name
-}
+#   vpc_id         = module.vpc.vpc_id
+#   private_subnets = module.vpc.private_subnets
+#   domain_name = var.domain_name
+# }
 
 module "alb" {
   source = "./modules/alb"
