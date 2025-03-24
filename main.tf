@@ -21,6 +21,7 @@ module "vpn" {
 
   vpc_id         = module.vpc.vpc_id
   private_subnets = module.vpc.private_subnets
+  domain_name = var.domain_name
 }
 
 module "alb" {
