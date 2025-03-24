@@ -1,14 +1,12 @@
 # Create a Client VPN Endpoint with simplified certificate handling
-resource "aws_ec2_client_vpn_endpoint" "eks_vpn" {
-  description            = "Client VPN for EKS"
-  server_certificate_arn = aws_acm_certificate.vpn_cert.arn
-  client_cidr_block      = var.vpn_client_cidr
-  vpc_id                 = var.vpc_id
-  security_group_ids     = [aws_security_group.vpn_sg.id]
+resource "aws_ec2_client_vpn_endpoint" "example" {
+  description            = "terraform-clientvpn-example"
+  server_certificate_arn = aws_acm_certificate.cert.arn
+  client_cidr_block      = "10.0.0.0/16"
 
   authentication_options {
     type                       = "certificate-authentication"
-    root_certificate_chain_arn = aws_acm_certificate.vpn_cert.arn
+    root_certificate_chain_arn = aws_acm_certificate.root_cert.arn
   }
 
   connection_log_options {
@@ -48,20 +46,5 @@ resource "aws_security_group" "vpn_sg" {
 
   tags = {
     Name = "eks-vpn-sg"
-  }
-}
-
-# Simplified ACM Certificate for private DNS
-resource "aws_acm_certificate" "vpn_cert" {
-  domain_name       = "vpn.internal"  # Private domain - no validation needed
-  validation_method = "DNS"
-
-  lifecycle {
-    # Skip DNS validation since we're using private DNS
-    ignore_changes = [domain_validation_options] 
-  }
-
-  tags = {
-    Name = "eks-vpn-cert"
   }
 }
