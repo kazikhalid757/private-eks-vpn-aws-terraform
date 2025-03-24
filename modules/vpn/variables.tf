@@ -20,3 +20,15 @@ variable "vpn_cert_domain" {
   default     = "vpn.eks.internal"
 }
 
+# VPN Variables
+variable "domain_name" {
+  type = string
+}
+variable "allowed_vpn_cidr" {
+  type    = string
+  default = "0.0.0.0/0" # Restrict this in production
+}
+variable "vpn_client_cidr" {
+  type    = string
+  default = "10.2.0.0/16"
+}

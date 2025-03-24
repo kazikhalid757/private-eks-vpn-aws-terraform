@@ -1,14 +1,35 @@
-# Create ACM Certificate for VPN (simplified for private DNS)
+# Self-signed certificate for VPN
+resource "tls_private_key" "vpn_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "tls_self_signed_cert" "vpn_cert" {
+  private_key_pem = tls_private_key.vpn_key.private_key_pem
+
+  subject {
+    common_name = "vpn.${var.domain_name}"
+  }
+
+  validity_period_hours = 8760 # 1 year
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+  ]
+}
+
 resource "aws_acm_certificate" "vpn_cert" {
-  domain_name       = "vpn.internal"  # Private domain
-  validation_method = "DNS"
+  private_key      = tls_private_key.vpn_key.private_key_pem
+  certificate_body = tls_self_signed_cert.vpn_cert.cert_pem
 
   tags = {
     Name = "eks-vpn-cert"
   }
 }
 
-# Security Group for VPN Access
+# Security Group for VPN
 resource "aws_security_group" "vpn_sg" {
   name        = "eks-vpn-sg"
   description = "Allow VPN traffic to EKS"
@@ -18,7 +39,7 @@ resource "aws_security_group" "vpn_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]  # Restrict this in production
+    cidr_blocks = [var.allowed_vpn_cidr]
   }
 
   egress {
@@ -29,7 +50,7 @@ resource "aws_security_group" "vpn_sg" {
   }
 
   tags = {
-    Name = "eks-vpn-security-group"
+    Name = "eks-vpn-sg"
   }
 }
 
@@ -37,10 +58,10 @@ resource "aws_security_group" "vpn_sg" {
 resource "aws_ec2_client_vpn_endpoint" "eks_vpn" {
   description            = "Client VPN for EKS Cluster"
   server_certificate_arn = aws_acm_certificate.vpn_cert.arn
-  client_cidr_block      = "10.2.0.0/16"  # Doesn't overlap with VPC CIDR
+  client_cidr_block      = var.vpn_client_cidr
   vpc_id                 = var.vpc_id
   security_group_ids     = [aws_security_group.vpn_sg.id]
-  split_tunnel           = true  # Recommended for better performance
+  split_tunnel           = true
 
   authentication_options {
     type                       = "certificate-authentication"
@@ -48,15 +69,15 @@ resource "aws_ec2_client_vpn_endpoint" "eks_vpn" {
   }
 
   connection_log_options {
-    enabled = false  # Enable and configure CloudWatch logs for production
+    enabled = false
   }
 
   tags = {
-    Name = "eks-client-vpn-endpoint"
+    Name = "eks-client-vpn"
   }
 }
 
-# Associate VPN with Subnets
+# Associate VPN with subnets
 resource "aws_ec2_client_vpn_network_association" "eks_vpn" {
   count                  = length(var.private_subnets)
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.eks_vpn.id
