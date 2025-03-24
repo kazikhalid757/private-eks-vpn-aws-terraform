@@ -22,29 +22,29 @@ module "eks" {
   }
 
   # Custom security group rules without duplicates
-  node_security_group_additional_rules = {
-    # Required egress rule (modified to prevent duplicates)
-    egress_all = {
-      description      = "Node all egress"
-      protocol         = "-1"
-      from_port        = 0
-      to_port          = 0
-      type             = "egress"
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = []
-    }
+  # node_security_group_additional_rules = {
+  #   # Required egress rule (modified to prevent duplicates)
+  #   egress_all = {
+  #     description      = "Node all egress"
+  #     protocol         = "-1"
+  #     from_port        = 0
+  #     to_port          = 0
+  #     type             = "egress"
+  #     cidr_blocks      = ["0.0.0.0/0"]
+  #     ipv6_cidr_blocks = ["::/0"]
+  #     prefix_list_ids  = []
+  #   }
 
-    # Recommended ingress rules
-    ingress_cluster = {
-      description                   = "Cluster to node all ports"
-      protocol                      = "-1"
-      from_port                     = 0
-      to_port                       = 0
-      type                          = "ingress"
-      source_cluster_security_group = true
-    }
-  }
+  #   # Recommended ingress rules
+  #   ingress_cluster = {
+  #     description                   = "Cluster to node all ports"
+  #     protocol                      = "-1"
+  #     from_port                     = 0
+  #     to_port                       = 0
+  #     type                          = "ingress"
+  #     source_cluster_security_group = true
+  #   }
+  # }
 
   eks_managed_node_groups = {
     default = {
