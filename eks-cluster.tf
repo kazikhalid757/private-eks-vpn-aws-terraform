@@ -1,9 +1,9 @@
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
   version         = "20.8.4"
-  cluster_name    = var.cluster_name
-  cluster_version = "1.29"
-  subnet_ids      = var.private_subnets
+  cluster_name    = local.cluster_name
+  cluster_version = var.kubernetes_version
+  subnet_ids      = module.vpc.private_subnets
 
   enable_irsa = true
 
@@ -11,7 +11,7 @@ module "eks" {
     cluster = "demo"
   }
 
-  vpc_id = var.vpc_id
+  vpc_id = module.vpc.vpc_id
 
   eks_managed_node_group_defaults = {
     ami_type               = "AL2_x86_64"
@@ -28,3 +28,4 @@ module "eks" {
     }
   }
 }
+

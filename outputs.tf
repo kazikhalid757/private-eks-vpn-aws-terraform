@@ -13,6 +13,17 @@ output "cluster_security_group_id" {
   value       = module.eks.cluster_security_group_id
 }
 
+output "region" {
+  description = "AWS region"
+  value       = var.aws_region
+}
+
 output "oidc_provider_arn" {
   value = module.eks.oidc_provider_arn
 }
+
+#output "zz_update_kubeconfig_command" {
+  # value = "aws eks update-kubeconfig --name " + module.eks.cluster_id
+#  value = format("%s %s %s %s", "aws eks update-kubeconfig --name", module.eks.cluster_id, "--region", var.aws_region)
+#}
+
