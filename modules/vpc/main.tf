@@ -62,12 +62,27 @@ resource "aws_security_group_rule" "all_worker_mgmt_ingress" {
   ]
 }
 
-resource "aws_security_group_rule" "all_worker_mgmt_egress" {
-  description       = "allow outbound traffic to anywhere"
-  from_port         = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.all_worker_mgmt.id
-  to_port           = 0
-  type              = "egress"
-  cidr_blocks       = ["0.0.0.0/0"]
+resource "aws_security_group" "alb_security_group" {
+  vpc_id =  aws_vpc.main.id
+
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+  }
+
+  ingress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+  }
+
+  tags = {
+    Name = "alb-security-group"
+  }
 }
+
+
+
