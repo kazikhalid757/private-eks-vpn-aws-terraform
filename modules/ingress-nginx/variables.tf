@@ -1,3 +1,3 @@
 variable "cluster_name" {}
-variable "alb_arn" {}
+variable "vpc_id" {}
 variable "private_domain" {}

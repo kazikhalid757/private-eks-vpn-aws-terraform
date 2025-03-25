@@ -40,9 +40,10 @@ module "dns" {
 module "ingress_nginx" {
   source          = "./modules/ingress-nginx"
   cluster_name    = module.eks.cluster_name
-  alb_arn         = module.alb.alb_dns_name
   private_domain  = module.dns.private_dns_name
+  vpc_id          = module.vpc.vpc_id
 }
+
 
 
 

@@ -25,5 +25,5 @@ resource "helm_release" "nginx_ingress" {
     value = var.private_domain
   }
 
-  depends_on = [module.alb]
+  depends_on = [module.eks]
 }
