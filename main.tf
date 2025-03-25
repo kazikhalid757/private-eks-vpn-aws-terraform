@@ -2,7 +2,7 @@
 module "vpc" {
   source         = "./modules/vpc"
   region         = var.aws_region
-  vpc_cidr       = var.aws_region
+  vpc_cidr       = var.vpc_cidr
   vpc_name       = "private-vpc"
   private_subnets = var.private_subnets
   azs            = var.azs
