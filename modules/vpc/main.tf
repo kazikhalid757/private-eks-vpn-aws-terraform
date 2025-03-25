@@ -1,67 +1,65 @@
-# Create VPC
-resource "aws_vpc" "main" {
-  cidr_block           = var.vpc_cidr
-  enable_dns_support   = true
+
+provider "aws" {
+  region = var.aws_region
+}
+
+data "aws_availability_zones" "available" {}
+
+locals {
+  cluster_name = "abhi-eks-${random_string.suffix.result}"
+}
+
+resource "random_string" "suffix" {
+  length  = 8
+  special = false
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.7.0"
+
+  name                 = "tamim-eks-vpc"
+  cidr                 = var.vpc_cidr
+  azs                  = data.aws_availability_zones.available.names
+  private_subnets      = var.private_subnets
+  public_subnets       = var.public_subnets
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
   enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags = {
-    Name = var.vpc_name
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+  }
+
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
+  }
+
+  private_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
   }
 }
 
-# Create Private Subnets
-resource "aws_subnet" "private" {
-  count = length(var.private_subnets)
-
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.private_subnets[count.index]
-  availability_zone       = element(var.azs, count.index)
-  map_public_ip_on_launch = false
-
-  tags = {
-    Name = "private-subnet-${count.index + 1}"
-  }
+resource "aws_security_group" "all_worker_mgmt" {
+  name_prefix = "all_worker_management"
+  vpc_id      = module.vpc.vpc_id
 }
 
-# NAT Gateway (For outbound internet access)
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.main.id
-}
-
-resource "aws_eip" "nat" {
-  domain = "vpc"
-}
-
-resource "aws_nat_gateway" "nat" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.private[0].id
-}
-
-# Private Route Table
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.main.id
-}
-
-resource "aws_route" "private_nat" {
-  route_table_id         = aws_route_table.private.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.nat.id
-}
-
-# Associate Route Table with Private Subnets
-resource "aws_route_table_association" "private" {
-  count          = length(var.private_subnets)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
-}
-
-# VPC Endpoints for AWS Services
-resource "aws_vpc_endpoint" "s3" {
-  vpc_id       = aws_vpc.main.id
-  service_name = "com.amazonaws.${var.region}.s3"
-  vpc_endpoint_type = "Gateway"
-
-  route_table_ids = [aws_route_table.private.id]
+resource "aws_security_group_rule" "all_worker_mgmt_ingress" {
+  description       = "allow inbound traffic from eks"
+  from_port         = 0
+  protocol          = "-1"
+  to_port           = 0
+  security_group_id = aws_security_group.all_worker_mgmt.id
+  type              = "ingress"
+  cidr_blocks = [
+    "10.0.0.0/8",
+    "172.16.0.0/12",
+    "192.168.0.0/16",
+  ]
 }
 
 resource "aws_security_group" "alb_security_group" {
@@ -83,15 +81,6 @@ resource "aws_security_group" "alb_security_group" {
 
   tags = {
     Name = "alb-security-group"
-  }
-}
-
-resource "aws_security_group" "eks_security_group" {
-  vpc_id = aws_vpc.main.id
-  name   = "eks-security-group"
-
-  tags = {
-    Name = "eks-security-group"
   }
 }
 
