@@ -20,6 +20,13 @@ module "eks" {
   node_role_arn  = module.iam.eks_node_role_arn
 }
 
+module "alb" {
+  source           = "./modules/alb"
+  vpc_id           = module.vpc.vpc_id
+  private_subnets  = module.vpc.private_subnets
+  security_group_id = module.vpc.alb_security_group_id
+}
+
 
 # module "vpn" {
 #   source = "./modules/vpn"

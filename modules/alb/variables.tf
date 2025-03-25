@@ -1,11 +1,14 @@
 variable "vpc_id" {
-  type = string
+  description = "The ID of the VPC"
+  type        = string
 }
 
 variable "private_subnets" {
-  type = list(string)
+  description = "List of private subnet IDs"
+  type        = list(string)
 }
 
-variable "eks_cluster_sg_id" {
-  type = string
+variable "security_group_id" {
+  description = "The security group ID for the load balancer"
+  type        = string
 }
