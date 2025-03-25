@@ -1,7 +1,11 @@
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
-  token                  = module.eks.cluster_auth_token
+  token                  = data.aws_eks_cluster_auth.this.token
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+}
+
+data "aws_eks_cluster_auth" "this" {
+  name = module.eks.cluster_name
 }
 
 resource "helm_release" "nginx_ingress" {
@@ -28,7 +32,7 @@ resource "helm_release" "nginx_ingress" {
 
   set {
     name  = "controller.replicaCount"
-    value = 2
+    value = "2"
   }
 
   set {
@@ -36,6 +40,5 @@ resource "helm_release" "nginx_ingress" {
     value = "LoadBalancer"
   }
 
- depends_on = [var.cluster_id]
+  depends_on = [module.eks]
 }
-
