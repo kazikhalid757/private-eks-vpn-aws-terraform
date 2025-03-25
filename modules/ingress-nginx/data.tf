@@ -18,3 +18,4 @@ data "kubernetes_service" "ingress_nginx" {
     helm_release.nginx-ingress-controller
   ]
 }
+

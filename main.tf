@@ -37,7 +37,7 @@ module "dns" {
   alb_dns     = module.alb.alb_dns_name
 }
 
-module "ingress_nginx" {
+module "ingress-nginx" {
   source          = "./modules/ingress-nginx"
   cluster_id      = module.eks.cluster_id
 }
