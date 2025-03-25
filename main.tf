@@ -1,20 +1,25 @@
-module "vpc" {
-  source = "./modules/vpc"
 
-  vpc_cidr             = var.vpc_cidr
-  public_subnet_cidrs  = var.public_subnet_cidrs
-  private_subnet_cidrs = var.private_subnet_cidrs
-  availability_zones   = var.availability_zones
+module "vpc" {
+  source         = "./modules/vpc"
+  region         = var.aws_region
+  vpc_cidr       = var.aws_region
+  vpc_name       = "private-vpc"
+  private_subnets = var.private_subnets
+  azs            = var.azs
+}
+
+module "iam" {
+  source = "./modules/iam"
 }
 
 module "eks" {
-  source = "./modules/eks"
-
-  vpc_id          = module.vpc.vpc_id
+  source         = "./modules/eks"
+  cluster_name   = "private-eks-cluster"
+  vpc_id         = module.vpc.vpc_id
   private_subnets = module.vpc.private_subnets
-  cluster_name    = var.cluster_name
-  cluster_version = var.cluster_version
+  node_role_arn  = module.iam.eks_node_role_arn
 }
+
 
 # module "vpn" {
 #   source = "./modules/vpn"
@@ -24,31 +29,27 @@ module "eks" {
 #   domain_name = var.domain_name
 # }
 
-module "alb" {
-  source = "./modules/alb"
+# module "alb" {
+#   source = "./modules/alb"
 
-  vpc_id            = module.vpc.vpc_id
-  private_subnets   = module.vpc.private_subnets
-  eks_cluster_sg_id = module.eks.cluster_security_group_id
-}
+#   vpc_id            = module.vpc.vpc_id
+#   private_subnets   = module.vpc.private_subnets
+#   eks_cluster_sg_id = module.eks.cluster_security_group_id
+# }
 
-module "nginx_ingress" {
-  source = "./modules/nginx-ingress"
+# module "nginx_ingress" {
+#   source = "./modules/nginx-ingress"
 
-  eks_cluster_endpoint = module.eks.cluster_endpoint
-  eks_cluster_ca_cert  = module.eks.cluster_certificate_authority_data
-  eks_cluster_token    = data.aws_eks_cluster_auth.cluster.token
-  alb_dns_name         = module.alb.alb_dns_name
-}
+#   eks_cluster_endpoint = module.eks.cluster_endpoint
+#   eks_cluster_ca_cert  = module.eks.cluster_certificate_authority_data
+#   eks_cluster_token    = data.aws_eks_cluster_auth.cluster.token
+#   alb_dns_name         = module.alb.alb_dns_name
+# }
 
-module "dns" {
-  source = "./modules/dns"
+# module "dns" {
+#   source = "./modules/dns"
 
-  vpc_id       = module.vpc.vpc_id
-  alb_dns_name = module.alb.alb_dns_name
-  domain_name  = var.domain_name
-}
-
-data "aws_eks_cluster_auth" "cluster" {
-  name = module.eks.cluster_name
-}
+#   vpc_id       = module.vpc.vpc_id
+#   alb_dns_name = module.alb.alb_dns_name
+#   domain_name  = var.domain_name
+# }
