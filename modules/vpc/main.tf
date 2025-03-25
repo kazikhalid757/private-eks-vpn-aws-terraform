@@ -86,5 +86,14 @@ resource "aws_security_group" "alb_security_group" {
   }
 }
 
+resource "aws_security_group" "eks_security_group" {
+  vpc_id = aws_vpc.main.id
+  name   = "eks-security-group"
+
+  tags = {
+    Name = "eks-security-group"
+  }
+}
+
 
 

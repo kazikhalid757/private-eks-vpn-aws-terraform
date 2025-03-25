@@ -19,3 +19,22 @@ module "eks" {
     Environment = "dev"
   }
 }
+
+resource "aws_security_group_rule" "allow_eks_nodes" {
+  type                     = "ingress"
+  from_port                = 1025
+  to_port                  = 65535
+  protocol                 = "tcp"
+  security_group_id        = module.eks.cluster_security_group_id
+  source_security_group_id = module.eks.node_security_group_id
+}
+
+resource "aws_security_group_rule" "allow_eks_api" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = module.eks.cluster_security_group_id
+  source_security_group_id = module.eks.node_security_group_id
+}
+
