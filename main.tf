@@ -9,15 +9,16 @@ module "vpc" {
   azs            = var.azs
 }
 
-# module "iam" {
-#   source = "./modules/iam"
-# }
+module "iam" {
+  source = "./modules/iam"
+}
 
 module "eks" {
   source         = "./modules/eks"
   cluster_name   = "private-eks-cluster"
   vpc_id         = module.vpc.vpc_id
   private_subnets = module.vpc.private_subnets
+  node_role_arn =module.iam.eks_node_role_arn
 }
 
 # module "alb" {
