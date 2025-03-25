@@ -23,6 +23,10 @@ output "alb_dns_name" {
   value = module.alb.alb_dns_name
 }
 
+output "dns_name" {
+  value = module.dns.private_dns_name
+}
+
 
 #output "zz_update_kubeconfig_command" {
   # value = "aws eks update-kubeconfig --name " + module.eks.cluster_id

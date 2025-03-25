@@ -30,3 +30,11 @@ module "alb" {
   eks_sg_id      = module.eks.cluster_security_group_id
 }
 
+module "dns" {
+  source      = "./modules/dns"
+  vpc_id      = module.vpc.vpc_id
+  domain_name = "eks.internal"
+  alb_dns     = module.alb.alb_dns_name
+}
+
+
