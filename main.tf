@@ -39,8 +39,6 @@ module "dns" {
 
 module "ingress_nginx" {
   source          = "./modules/ingress-nginx"
-  cluster_name    = module.eks.cluster_name
-  private_domain  = module.dns.private_dns_name
   cluster_id      = module.eks.cluster_id
 }
 
