@@ -1,40 +1,30 @@
 module "eks" {
   source          = "terraform-aws-modules/eks/aws"
+  version         = "20.8.4"
   cluster_name    = var.cluster_name
-  cluster_version = "1.29"
+  cluster_version = var.kubernetes_version
   subnet_ids      = var.private_subnets
-  vpc_id          = var.vpc_id
 
-  eks_managed_node_groups = {
-    eks_nodes = {
-      desired_capacity = 1
-      max_capacity     = 1
-      min_capacity     = 1
-      instance_types   = ["t3.medium"]
-      iam_role_arn     = var.node_role_arn
-    }
-  }
+  enable_irsa = true
 
   tags = {
-    Environment = "dev"
+    cluster = "demo"
+  }
+
+  vpc_id = var.vpc_id
+
+  eks_managed_node_group_defaults = {
+    ami_type               = "AL2_x86_64"
+    instance_types         = ["t3.medium"]
+    vpc_security_group_ids = [aws_security_group.all_worker_mgmt.id]
+  }
+
+  eks_managed_node_groups = {
+
+    node_group = {
+      min_size     = 2
+      max_size     = 6
+      desired_size = 2
+    }
   }
 }
-
-resource "aws_security_group_rule" "allow_eks_nodes" {
-  type                     = "ingress"
-  from_port                = 1025
-  to_port                  = 65535
-  protocol                 = "tcp"
-  security_group_id        = module.eks.cluster_security_group_id
-  source_security_group_id = module.eks.node_security_group_id
-}
-
-resource "aws_security_group_rule" "allow_eks_api" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  security_group_id        = module.eks.cluster_security_group_id
-  source_security_group_id = module.eks.node_security_group_id
-}
-
