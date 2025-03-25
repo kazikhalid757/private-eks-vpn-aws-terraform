@@ -37,4 +37,12 @@ module "dns" {
   alb_dns     = module.alb.alb_dns_name
 }
 
+module "ingress_nginx" {
+  source          = "./modules/ingress-nginx"
+  cluster_name    = module.eks.cluster_name
+  alb_arn         = module.alb.alb_dns_name
+  private_domain  = module.dns.private_dns_name
+}
+
+
 

@@ -6,6 +6,10 @@ output "cluster_id" {
   description = "EKS cluster ID."
   value       = module.eks.cluster_id
 }
+output "cluster_name" {
+  description = "EKS cluster Name."
+  value       = module.eks.cluster_name
+}
 
 output "cluster_endpoint" {
   description = "Endpoint for EKS control plane."
@@ -26,6 +30,11 @@ output "alb_dns_name" {
 output "dns_name" {
   value = module.dns.private_dns_name
 }
+
+output "nginx_ingress" {
+  value = module.ingress_nginx.ingress_controller_name
+}
+
 
 
 #output "zz_update_kubeconfig_command" {
