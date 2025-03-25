@@ -39,7 +39,7 @@ module "dns" {
 
 module "ingress-nginx" {
   source          = "./modules/ingress-nginx"
-  cluster_id      = module.eks.cluster_id
+  cluster_id      = module.eks.cluster_name
 }
 
 
