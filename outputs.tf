@@ -31,8 +31,8 @@ output "dns_name" {
   value = module.dns.private_dns_name
 }
 
-output "nginx_ingress" {
-  value = module.ingress_nginx.ingress_controller_name
+output "k8s_service_ingress_elb" {
+  value = module.ingress_nginx.k8s_service_ingress_elb
 }
 
 
