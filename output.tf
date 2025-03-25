@@ -13,9 +13,9 @@ output "eks_cluster_id" {
   value = module.eks.eks_cluster_id
 }
 
-# output "alb_dns_name" {
-#   value = module.alb.alb_dns_name
-# }
+output "alb_dns_name" {
+  value = module.alb.alb_url
+}
 
 # output "nginx_ingress_dns" {
 #   value = module.dns.nginx_ingress_dns
