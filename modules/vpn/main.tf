@@ -22,7 +22,6 @@ resource "aws_acm_certificate" "vpn_cert" {
   }
 }
 
-# 3️⃣ Create AWS Client VPN Endpoint
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description            = "EKS Client VPN"
   server_certificate_arn = aws_acm_certificate.vpn_cert.arn
@@ -38,7 +37,10 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   connection_log_options {
     enabled = false
   }
+
+  depends_on = [module.dns.aws_route53_record.vpn_cert_validation]  # Ensure the DNS validation is complete before creating the VPN
 }
+
 
 # 4️⃣ Associate VPN with Private Subnet
 resource "aws_ec2_client_vpn_network_association" "vpn_assoc" {
