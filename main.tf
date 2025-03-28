@@ -35,7 +35,7 @@ module "vpn" {
   domain_name        = "tamim.eks.com"
   vpc_id             = module.vpc.vpc_id
   client_cidr_block  = "10.10.0.0/22"
-  vpc_cidr           = module.vpc.vpc_cidr_block
+  vpc_cidr           = var.vpc_cidr
   private_subnet_id  = module.vpc.private_subnets[0]
 }
 
