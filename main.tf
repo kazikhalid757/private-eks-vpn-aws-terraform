@@ -41,7 +41,7 @@ module "vpc" {
 module "vpn" {
   source           = "./modules/vpn"
   vpc_id          = module.vpc.vpc_id
-  subnet_id       = element(module.vpc.private_subnets, 0)
+  private_subnet_id = module.vpc.private_subnets[0]
   vpc_cidr        = var.vpc_cidr
   domain_name = var.domain_name
 }

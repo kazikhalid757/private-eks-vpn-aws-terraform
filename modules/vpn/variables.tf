@@ -14,7 +14,7 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "subnet_id" {
+variable "private_subnet_id" {
   description = "Private subnet ID for VPN attachment"
   type        = string
 }

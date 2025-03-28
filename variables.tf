@@ -30,5 +30,5 @@ variable "public_subnets" {
 }
 variable "domain_name" {
   type = string
-  default = "tamim.eks"
+  default = "eks.internal"
 }
