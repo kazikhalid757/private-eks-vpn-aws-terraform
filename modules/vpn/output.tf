@@ -4,6 +4,6 @@ output "vpn_cert_domain_validation_options" {
 }
 
 output "vpn_dns_name" {
-  description = "The DNS name for the VPN endpoint"
+  description = "The DNS name of the VPN endpoint"
   value       = aws_ec2_client_vpn_endpoint.vpn.dns_name
 }

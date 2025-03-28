@@ -30,19 +30,19 @@ module "vpc" {
 #   eks_sg_id      = module.eks.cluster_security_group_id
 # }
 
+module "vpn" {
+  source             = "./modules/vpn"
+  domain_name        = "tamim.eks.com"
+  vpc_id             = module.vpc.vpc_id
+  client_cidr_block  = "10.10.0.0/22"
+  vpc_cidr           = module.vpc.vpc_cidr_block
+  private_subnet_id  = module.vpc.private_subnets[0]
+}
+
 module "dns" {
   source      = "./modules/dns"
   domain_name = "tamim.eks.com"
   vpc_id      = module.vpc.vpc_id
+  vpn_cert_domain_validation_options = module.vpn.vpn_cert_domain_validation_options
+  vpn_dns_name                       = module.vpn.vpn_dns_name
 }
-
-module "vpn" {
-  source             = "./modules/vpn"
-  domain_name        = module.dns.vpn_dns_name
-  vpc_id             = module.vpc.vpc_id
-  client_cidr_block  = "10.10.0.0/22"
-  vpc_cidr           = var.vpc_cidr
-  private_subnet_id  = module.vpc.private_subnets[0]
-}
-
-

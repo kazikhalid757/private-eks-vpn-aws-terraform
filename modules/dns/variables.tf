@@ -9,11 +9,16 @@ variable "vpc_id" {
 }
 
 variable "vpn_cert_domain_validation_options" {
-  description = "Domain validation options from VPN module"
-  type        = map(any)
+  type = list(object({
+    resource_record_name  = string
+    resource_record_type  = string
+    resource_record_value = string
+  }))
+  description = "DNS validation options for the VPN ACM certificate"
 }
 
 variable "vpn_dns_name" {
-  description = "The DNS name of the VPN endpoint"
+  description = "The DNS name for the VPN endpoint"
   type        = string
 }
+
