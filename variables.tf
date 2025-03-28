@@ -28,4 +28,7 @@ variable "public_subnets" {
   default  =  ["10.0.4.0/24", "10.0.5.0/24"]
   
 }
-
+variable "domain_name" {
+  type = string
+  default = "eks.internal"
+}

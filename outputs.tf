@@ -31,12 +31,7 @@ output "dns_name" {
   value = module.dns.private_dns_name
 }
 
-
-
-
-#output "zz_update_kubeconfig_command" {
-  # value = "aws eks update-kubeconfig --name " + module.eks.cluster_id
-#  value = format("%s %s %s %s", "aws eks update-kubeconfig --name", module.eks.cluster_id, "--region", var.aws_region)
-#}
-
+output "vpn_endpoint_id" {
+  value = module.vpn.vpn_endpoint_id
+}
 
