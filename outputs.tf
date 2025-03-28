@@ -35,3 +35,6 @@ output "vpn_endpoint_id" {
   value = module.vpn.vpn_endpoint_id
 }
 
+output "vpn_endpoint_dns_name" {
+  value = module.vpn.vpn_endpoint_dns_name
+}
