@@ -6,15 +6,16 @@ resource "aws_route53_zone" "private_dns_zone" {
   }
 }
 
-# DNS record for ACM certificate validation
 resource "aws_route53_record" "vpn_cert_validation" {
-  for_each = var.vpn_cert_domain_validation_options
+  for_each = { for idx, val in var.vpn_cert_domain_validation_options : idx => val }
+  
   zone_id  = aws_route53_zone.private_dns_zone.zone_id
   name     = each.value.resource_record_name
   type     = each.value.resource_record_type
   records  = [each.value.resource_record_value]
   ttl      = 60
 }
+
 
 
 # Create an A Record for VPN Endpoint
