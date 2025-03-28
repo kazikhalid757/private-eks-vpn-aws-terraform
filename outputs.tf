@@ -31,10 +31,10 @@ output "vpc_id" {
 #   value = module.dns.private_dns_name
 # }
 
-output "vpn_endpoint_id" {
-  value = module.vpn.vpn_endpoint_id
-}
+# output "vpn_endpoint_id" {
+#   value = module.vpn.vpn_endpoint_id
+# }
 
-output "vpn_endpoint_dns_name" {
-  value = module.vpn.vpn_endpoint_dns_name
+output "vpn_dns_name" {
+  value = module.vpn.vpn_dns_name
 }
