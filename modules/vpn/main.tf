@@ -38,7 +38,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
     enabled = false
   }
 
-  depends_on = [module.dns.aws_route53_record.vpn_cert_validation]  # Ensure the DNS validation is complete before creating the VPN
+  depends_on = [aws_route53_record.vpn_cert_validation]  # Reference the whole resource, not just an attribute
 }
 
 
