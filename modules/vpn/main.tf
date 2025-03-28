@@ -1,4 +1,4 @@
-# Create a Private Certificate Authority (CA)
+# 1️⃣ Create a Private Certificate Authority (CA)
 resource "aws_acmpca_certificate_authority" "private_ca" {
   type = "ROOT"
 
@@ -12,37 +12,17 @@ resource "aws_acmpca_certificate_authority" "private_ca" {
   }
 }
 
-# Generate a Self-Signed Certificate for the CA
-resource "aws_acmpca_certificate" "self_signed_ca_cert" {
-  certificate_authority_arn = aws_acmpca_certificate_authority.private_ca.arn
-  certificate_signing_request = aws_acmpca_certificate_authority.private_ca.certificate_signing_request
-
-  signing_algorithm = "SHA256WITHRSA"
-  
-  validity {
-    type  = "YEARS"
-    value = 10
-  }
-}
-
-# Activate the CA after issuing the self-signed certificate
-resource "aws_acmpca_certificate_authority_activation" "activate_ca" {
-  certificate_authority_arn = aws_acmpca_certificate_authority.private_ca.arn
-  certificate               = aws_acmpca_certificate.self_signed_ca_cert.certificate
-}
-
-# Create an ACM Certificate for VPN
+# 2️⃣ Issue ACM Certificate for VPN
 resource "aws_acm_certificate" "vpn_cert" {
-  domain_name               = var.domain_name
-  validation_method         = "DNS"
-  certificate_authority_arn = aws_acmpca_certificate_authority.private_ca.arn
+  domain_name       = var.domain_name
+  validation_method = "DNS"
 
   options {
     certificate_transparency_logging_preference = "DISABLED"
   }
 }
 
-# AWS Client VPN Endpoint
+# 3️⃣ Create AWS Client VPN Endpoint
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description            = "EKS Client VPN"
   server_certificate_arn = aws_acm_certificate.vpn_cert.arn
@@ -51,8 +31,8 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   vpc_id                 = var.vpc_id
 
   authentication_options {
-    type                       = "certificate-authentication"
-    root_certificate_chain_arn = aws_acm_certificate.vpn_cert.arn
+    type                        = "certificate-authentication"
+    root_certificate_chain_arn  = aws_acm_certificate.vpn_cert.arn
   }
 
   connection_log_options {
@@ -60,20 +40,20 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   }
 }
 
-# Associate VPN with Private Subnet
+# 4️⃣ Associate VPN with Private Subnet
 resource "aws_ec2_client_vpn_network_association" "vpn_assoc" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
   subnet_id              = var.private_subnet_id
 }
 
-# Authorization Rule
+# 5️⃣ Allow VPN Access to Private Cluster
 resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
   target_network_cidr    = var.vpc_cidr
   authorize_all_groups   = true
 }
 
-# Route VPN Traffic
+# 6️⃣ Add Route for VPN to Access Private Subnets
 resource "aws_ec2_client_vpn_route" "vpn_route" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
   destination_cidr_block = var.vpc_cidr
